@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { 
+  FormGroup,
+  FormLabel,
+  FormControl,
+  Button,
+  Form
+} from "react-bootstrap";
+
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const api = axios.create({
   baseURL: `https://covid-api.mmediagroup.fr/v1`,
@@ -35,13 +44,30 @@ function App() {
 
   if (covidData.All) {
     percentageAffected = (
-      (covidData.All.confirmed / covidData.All.population) * 100
+      (covidData.All.confirmed / covidData.All.population) *
+      100
     ).toFixed(2);
   }
 
   return (
     <div className="App">
-      <form onSubmit={handleSubmit}>
+      <Form
+        className="d-flex m-5 align-items-end"
+        onSubmit={handleSubmit}
+      >
+        <FormGroup>
+          <FormLabel>Find a country</FormLabel>
+          <FormControl
+            type="text"
+            name="country"
+            value={country}
+            placeholder="Search for your country"
+            onChange={handleChange}
+          />
+        </FormGroup>
+        <Button variant="primary" type="submit" className="h-50">Submit</Button>
+      </Form>
+      {/* <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="country"
@@ -50,7 +76,7 @@ function App() {
           onChange={handleChange}
         />
         <button>Search</button>
-      </form>
+      </form> */}
       {covidData.All ? (
         <>
           <h2>Covid statistics for {covidData.All.country}</h2>
