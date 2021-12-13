@@ -22,13 +22,17 @@ function App() {
   useEffect(() => {
     async function getCountry() {
       let data = await api
-        .get(`/cases?country=${searchQuery}`)
+        .get(`/cases?country=${capitalizeFirstLetters(searchQuery)}`)
         .then(({ data }) => data);
       setCovidData(data);
     }
 
     getCountry();
   }, [searchQuery]);
+
+  function capitalizeFirstLetters(string) {
+    return string.replace(/(^\w|\s\w)(\S*)/g, (_,m1,m2) => m1.toUpperCase()+m2.toLowerCase());
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -51,40 +55,32 @@ function App() {
 
   return (
     <div className="App">
-      <Form
-        className="d-flex m-5 align-items-end"
-        onSubmit={handleSubmit}
-      >
-        <FormGroup>
-          <FormLabel>Find a country</FormLabel>
-          <FormControl
-            type="text"
-            name="country"
-            value={country}
-            placeholder="Search for your country"
-            onChange={handleChange}
-          />
-        </FormGroup>
-        <Button variant="primary" type="submit" className="h-50">Submit</Button>
-      </Form>
-      {/* <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="country"
-          value={country}
-          placeholder="Search for your country"
-          onChange={handleChange}
-        />
-        <button>Search</button>
-      </form> */}
-      {covidData.All ? (
-        <>
-          <h2>Covid statistics for {covidData.All.country}</h2>
-          <p>Total cases: {covidData.All.confirmed}</p>
-          <p>Total deaths: {covidData.All.deaths}</p>
-          <p>Percentage of population affected: {percentageAffected}</p>
-        </>
-      ) : null}
+      <div className="container d-flex flex-column align-items-center">
+        <Form
+          className="d-flex m-5 align-items-end"
+          onSubmit={handleSubmit}
+        >
+          <FormGroup>
+            <FormLabel>Find a country</FormLabel>
+            <FormControl
+              type="text"
+              name="country"
+              value={country}
+              placeholder="Search for your country"
+              onChange={handleChange}
+            />
+          </FormGroup>
+          <Button variant="primary" type="submit" className="h-50">Submit</Button>
+        </Form>
+        {covidData.All ? (
+          <div className="text-left">
+            <h2 className="mb-4">Covid statistics for {covidData.All.country}</h2>
+            <p>Total cases: {covidData.All.confirmed}</p>
+            <p>Total deaths: {covidData.All.deaths}</p>
+            <p>Percentage of population affected: {percentageAffected}</p>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
