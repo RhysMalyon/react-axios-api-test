@@ -1,32 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios'
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: `https://covid-api.mmediagroup.fr/v1`
-})
+  baseURL: `https://covid-api.mmediagroup.fr/v1`,
+});
 
 function App() {
-  const [japanCovidData, setJapanCovidData] = useState([])
-  
+  const [country, setCountry] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [covidData, setCovidData] = useState([]);
+
   useEffect(() => {
-    async function getCases() {
-      let data = await api.get('/cases').then(({ data }) => data)
-      setJapanCovidData(data.Japan)
+    async function getCountry() {
+      let data = await api
+        .get(`/cases?country=${searchQuery}`)
+        .then(({ data }) => data);
+      setCovidData(data);
     }
-    getCases()
-  }, [])
 
-  const handleClick = () => {
-    console.log(japanCovidData)
+    getCountry();
+  }, [searchQuery]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    setSearchQuery(country);
+  };
+
+  const handleChange = (event) => {
+    setCountry(event.target.value);
+  };
+
+  let percentageAffected = 0;
+
+  if (covidData.All) {
+    percentageAffected = (
+      (covidData.All.confirmed / covidData.All.population) * 100
+    ).toFixed(2);
   }
-
-  const populationAffected = (japanCovidData.All.confirmed / japanCovidData.All.population) * 100
 
   return (
     <div className="App">
-      <p>Total cases: {japanCovidData.All.confirmed}</p>
-      <p>Percentage of population affected: {(populationAffected).toFixed(2)}%</p>
-      <button onClick={handleClick}>Log data</button>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="country"
+          value={country}
+          placeholder="Search for your country"
+          onChange={handleChange}
+        />
+        <button>Search</button>
+      </form>
+      {covidData.All ? (
+        <>
+          <h2>Covid statistics for {covidData.All.country}</h2>
+          <p>Total cases: {covidData.All.confirmed}</p>
+          <p>Total deaths: {covidData.All.deaths}</p>
+          <p>Percentage of population affected: {percentageAffected}</p>
+        </>
+      ) : null}
     </div>
   );
 }
